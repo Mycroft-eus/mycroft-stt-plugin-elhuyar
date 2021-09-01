@@ -5,7 +5,7 @@ import pathlib
 
 PLUGIN_TYPE = 'stt'
 PLUGIN_MODULE_NAME = 'elhuyar_stt'
-PLUGIN_TARGET = 'mycroft_stt-plugin-elhuyar:ElhuyarSTTPlugin'
+PLUGIN_TARGET = 'mycroft_stt_plugin_elhuyar:ElhuyarSTTPlugin'
 
 PLUGIN_KEYWORDS = 'mycroft plugin {}'.format(PLUGIN_TYPE)
 PLUGIN_NAMESPACE = 'mycroft.plugin.{}'.format(PLUGIN_TYPE)

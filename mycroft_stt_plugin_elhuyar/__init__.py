@@ -15,6 +15,7 @@
 #
 
 import http
+import json
 
 from mycroft.stt import STT
 from mycroft.util.log import LOG
@@ -33,13 +34,17 @@ class ElhuyarSTTPlugin(STT):
 
     def execute(self, audio, language=None):
         language = language or self.lang
-        if language not in supported_langs:
+        if language.lower() not in supported_langs:
             raise ValueError(
                 "Unsupported language '{}' for Elhuyar STT".format(language))
+        if language.find('-') != -1:
+            language = language[:language.find('-')]
+        if len(language)>2:
+            language = language[:2]
         uri = "live.aditu.eus"
         conn = http.client.HTTPSConnection(uri)
         conn.connect()
-        url = "/"+self.lang+"/client/http/recognize"
+        url = "/"+language+"/client/http/recognize"
         conn.putrequest('POST', url)
         conn.putheader('Transfer-Encoding', 'chunked')
         conn.putheader('Content-Type', "audio/x-raw-int; rate=16000")
@@ -58,8 +63,9 @@ class ElhuyarSTTPlugin(STT):
             conn.send(audioData[-(len(audioData) % chunk_size):] + b"\r\n")
         conn.send(b"0\r\n\r\n")
         resp = conn.getresponse()
-        hypothese = json.loads(resp.read())
-        transcript = hypothese['hypotheses'][0]['transcript']
+        response_text = resp.read()
         conn.close()
-        LOG.info(text)
+        response_json = json.loads(response_text)
+        transcript = response_json['hypotheses'][0]['transcript'].lower().rstrip('.')
+        LOG.info(transcript)
         return transcript
